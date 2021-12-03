@@ -34,8 +34,21 @@ while reshuffle:
             break
         else:
             reshuffle = True
-print(f"Stock pieces: {stock}")
-print(f"Computer pieces: {computer}")
-print(f"Player pieces: {player}")
-print(f"Domino snake: {snake}")
-print(f"Status: {status}")
+# print(f"Stock pieces: {stock}")
+# print(f"Computer pieces: {computer}")
+print("=" * 70)
+print(f"Stock size: {len(stock)}")
+print(f"Computer pieces: {len(computer)}")
+print()
+print(snake[0])
+print()
+print("Your pieces:")
+n = 1
+for piece in player:
+    print(f"{n}:{piece}")
+    n += 1
+print()
+if status == "player":
+    print("Status: It's your turn to make a move. Enter your command.")
+elif status == "computer":
+    print("Status: Computer is about to make a move. Press Enter to continue...")
