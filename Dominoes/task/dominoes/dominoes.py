@@ -14,21 +14,21 @@ while reshuffle:
     computer = domino_set[14:21]
     player = domino_set[21:28]
 #    print(domino_set)
-    print(stock)
+#    print(stock)
 #    print(computer)
 #    print(player)
 
     # determine snake and first player
-    for n in range(0, 7):
+    for n in range(7, 0, -1):
         if [n, n] in computer:
             computer.remove([n, n])
-            snake = [n, n]
+            snake = [[n, n]]
             status = "player"
             reshuffle = False
             break
         elif [n, n] in player:
             player.remove([n, n])
-            snake = [n, n]
+            snake = [[n, n]]
             status = "computer"
             reshuffle = False
             break
