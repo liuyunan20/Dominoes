@@ -62,7 +62,7 @@ def make_move(part, part_move):
     elif int(part_move) < 0:
         snake.insert(0, part.pop(-int(part_move) - 1))
     elif int(player_move) == 0:
-        part.append(stock.pop(random.randint(0, len(stock))))
+        part.append(stock.pop(random.randint(0, len(stock) - 1)))
 
 
 while game_continue:
@@ -71,9 +71,9 @@ while game_continue:
     print(f"Computer pieces: {len(computer)}")
     print()
     if len(snake) <= 6:
-        print(snake)
+        print(*snake, sep="")
     else:
-        print(f"{snake[0],snake[1],snake[2]}...{snake[-3],snake[-2],snake[-1]}")
+        print(f"{snake[0]}{snake[1]}{snake[2]}...{snake[-3]}{snake[-2]}{snake[-1]}")
     print()
     print("Your pieces:")
     n = 1
@@ -101,9 +101,8 @@ while game_continue:
             make_move(player, player_move)
             status = "computer"
         elif status == "computer":
-            print("Status: Computer is about to make a move. Press Enter to continue...")
-            input()
-            computer_move = random.randint(-len(computer), len(computer) + 1)
+            input("Status: Computer is about to make a move. Press Enter to continue...")
+            computer_move = random.randint(-len(computer), len(computer))
             make_move(computer, computer_move)
             status = "player"
     else:
