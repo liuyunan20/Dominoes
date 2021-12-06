@@ -34,10 +34,11 @@ while reshuffle:
             break
         else:
             reshuffle = True
-
+# play the game
 game_result = ""
 game_continue = True
 stock_empty = False
+domino_num = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 
 
 # define a function for checking game end
@@ -95,6 +96,56 @@ def make_move(part, part_move):
         move_illegal = False
 
 
+def ai(part):
+    domino_num[0] = part.count(0) + snake.count(0)
+    domino_num[1] = part.count(1) + snake.count(1)
+    domino_num[2] = part.count(2) + snake.count(2)
+    domino_num[3] = part.count(3) + snake.count(3)
+    domino_num[4] = part.count(4) + snake.count(4)
+    domino_num[5] = part.count(5) + snake.count(5)
+    domino_num[6] = part.count(6) + snake.count(6)
+    scores = {}
+    for dp in part:
+        scores[str(dp)] = domino_num[dp[0]] + domino_num[dp[1]]
+    score_list = sorted(scores.items(), key=lambda x: x[1])
+    sort_scores = dict(score_list)
+    sort_dp = list(sort_scores.keys())
+    match = False
+    for i in range(1, len(sort_dp) + 1):
+        if snake[-1][-1] == sort_dp[-i][0]:
+            snake.append(sort_dp[-i])
+            part.remove(sort_dp[-i])
+            match = True
+            break
+        elif snake[-1][-1] == sort_dp[-i][1]:
+            x = sort_dp[-i][1]
+            sort_dp[-i][1] = sort_dp[-i][0]
+            sort_dp[-i][0] = x
+            snake.append(sort_dp[-i])
+            part.remove(sort_dp[-i])
+            match = True
+            break
+        elif snake[0][0] == sort_dp[-i][1]:
+            snake.insert(0, sort_dp[-i])
+            part.remove(sort_dp[-i])
+            match = True
+            break
+        elif snake[0][0] == sort_dp[-i][0]:
+            x = sort_dp[-i][1]
+            sort_dp[-i][1] = sort_dp[-i][0]
+            sort_dp[-i][0] = x
+            snake.insert(0, sort_dp[-i])
+            part.remove(sort_dp[-i])
+            match = True
+            break
+    if not match:
+        if len(stock) == 0:
+            global stock_empty
+            stock_empty = True
+        else:
+            part.append(stock.pop(random.randint(0, len(stock) - 1)))
+
+
 while game_continue:
     print("=" * 70)
     print(f"Stock size: {len(stock)}")
@@ -138,10 +189,7 @@ while game_continue:
             status = "computer"
         elif status == "computer":
             input("Status: Computer is about to make a move. Press Enter to continue...")
-            move_illegal = True
-            while move_illegal:
-                computer_move = random.randint(-len(computer), len(computer))
-                make_move(computer, computer_move)
+            ai(computer)
             status = "player"
     else:
         print(f"Status: The game is over. {game_result}")
