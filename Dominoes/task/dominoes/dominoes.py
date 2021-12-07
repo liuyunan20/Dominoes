@@ -43,6 +43,7 @@ domino_num = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
 
 # define a function for checking game end
 def check_end():
+    snake_n = [x for group in snake for x in group]
     global game_result
     global game_continue
     if len(player) == 0:
@@ -51,7 +52,7 @@ def check_end():
     elif len(computer) == 0:
         game_result = "The computer won!"
         game_continue = False
-    elif snake[0][0] == snake[-1][-1] and snake.count(snake[0][0]) == 8:
+    elif snake[0][0] == snake[-1][-1] and snake_n.count(snake[0][0]) == 8:
         game_result = "It's a draw!"
         game_continue = False
     elif stock_empty:
@@ -96,54 +97,65 @@ def make_move(part, part_move):
         move_illegal = False
 
 
-def ai(part):
-    domino_num[0] = part.count(0) + snake.count(0)
-    domino_num[1] = part.count(1) + snake.count(1)
-    domino_num[2] = part.count(2) + snake.count(2)
-    domino_num[3] = part.count(3) + snake.count(3)
-    domino_num[4] = part.count(4) + snake.count(4)
-    domino_num[5] = part.count(5) + snake.count(5)
-    domino_num[6] = part.count(6) + snake.count(6)
+def check_match(part, dp):
+    global match
+    if snake[-1][-1] == dp[0]:
+        snake.append(dp)
+        part.remove(dp)
+        match = True
+    elif snake[-1][-1] == dp[1]:
+        x = dp[1]
+        dp[1] = dp[0]
+        dp[0] = x
+        snake.append(dp)
+        part.remove(dp)
+        match = True
+    elif snake[0][0] == dp[1]:
+        snake.insert(0, dp)
+        part.remove(dp)
+        match = True
+    elif snake[0][0] == dp[0]:
+        x = dp[1]
+        dp[1] = dp[0]
+        dp[0] = x
+        snake.insert(0, dp)
+        part.remove(dp)
+        match = True
+    else:
+        match = False
+
+
+def ai(parts):
+    part = [x for group in parts for x in group]
+    snake_n = [x for group in snake for x in group]
+    domino_num[0] = part.count(0) + snake_n.count(0)
+    domino_num[1] = part.count(1) + snake_n.count(1)
+    domino_num[2] = part.count(2) + snake_n.count(2)
+    domino_num[3] = part.count(3) + snake_n.count(3)
+    domino_num[4] = part.count(4) + snake_n.count(4)
+    domino_num[5] = part.count(5) + snake_n.count(5)
+    domino_num[6] = part.count(6) + snake_n.count(6)
+#    print(domino_num)
     scores = {}
-    for dp in part:
+    for dp in parts:
         scores[str(dp)] = domino_num[dp[0]] + domino_num[dp[1]]
-    score_list = sorted(scores.items(), key=lambda x: x[1])
-    sort_scores = dict(score_list)
-    sort_dp = list(sort_scores.keys())
+#    print(scores)
+    global match
     match = False
-    for i in range(1, len(sort_dp) + 1):
-        if snake[-1][-1] == sort_dp[-i][0]:
-            snake.append(sort_dp[-i])
-            part.remove(sort_dp[-i])
-            match = True
-            break
-        elif snake[-1][-1] == sort_dp[-i][1]:
-            x = sort_dp[-i][1]
-            sort_dp[-i][1] = sort_dp[-i][0]
-            sort_dp[-i][0] = x
-            snake.append(sort_dp[-i])
-            part.remove(sort_dp[-i])
-            match = True
-            break
-        elif snake[0][0] == sort_dp[-i][1]:
-            snake.insert(0, sort_dp[-i])
-            part.remove(sort_dp[-i])
-            match = True
-            break
-        elif snake[0][0] == sort_dp[-i][0]:
-            x = sort_dp[-i][1]
-            sort_dp[-i][1] = sort_dp[-i][0]
-            sort_dp[-i][0] = x
-            snake.insert(0, sort_dp[-i])
-            part.remove(sort_dp[-i])
-            match = True
+    for i in range(14, -1, -1):
+        for dp in parts:
+            if scores[str(dp)] == i:
+                check_match(parts, dp)
+            if match:
+                break
+        if match:
             break
     if not match:
         if len(stock) == 0:
             global stock_empty
             stock_empty = True
         else:
-            part.append(stock.pop(random.randint(0, len(stock) - 1)))
+            parts.append(stock.pop(random.randint(0, len(stock) - 1)))
 
 
 while game_continue:
@@ -189,6 +201,7 @@ while game_continue:
             status = "computer"
         elif status == "computer":
             input("Status: Computer is about to make a move. Press Enter to continue...")
+            match = False
             ai(computer)
             status = "player"
     else:
